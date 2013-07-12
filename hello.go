@@ -1,30 +1,32 @@
 package main
 
 import (
-  "fmt"
-//  "time"
-  "net/http"
-//  "io/ioutil"
+	"fmt"
+	"io/ioutil"
+	"net/http"
 )
 
 func main() {
-  c := make(chan int)
-  n := 100
+	c := make(chan int)
+	n := 100
+	var foo [100]string
 
-  for i := 0; i < n; i++ {
-    go func(i int) {
-//      time.Sleep(time.Duration(1) * time.Second)
-      resp, err := http.Get("http://golang.org/")
-      if err != nil {
-        return
-      }
-      defer resp.Body.Close()
-//      body, err := ioutil.ReadAll(resp.Body)
-      c <- i
-    }(i)
-  }
+	for i := 0; i < n; i++ {
+		go func(i int) {
+			resp, err := http.Get("http://golang.org/")
+			if err != nil {
+				return
+			}
+			body, err := ioutil.ReadAll(resp.Body)
+			foo[i] = string(body)
+			defer resp.Body.Close()
+			c <- i
+		}(i)
+	}
 
-  for i := 0; i < n; i++ {
-    fmt.Println(<-c)
-  }
+	for i := 0; i < n; i++ {
+		fmt.Println(<-c)
+	}
+//	fmt.Println(foo)
+
 }
